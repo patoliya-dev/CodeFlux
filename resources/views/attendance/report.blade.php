@@ -2,9 +2,8 @@
 @section('title', 'Attendance Recognition')
 @section('content')
 <style>
-    /* Better look for multi-select */
     .custom-multiselect {
-        height: auto; /* expand automatically */
+        height: auto;
         min-height: 120px;
         padding: 6px;
         border-radius: 8px;
@@ -19,7 +18,7 @@
 
     /* Highlight selected options */
     .custom-multiselect option:checked {
-        background-color: #0d6efd;
+        background-color: #764ba2 !important;
         color: #fff;
         font-weight: 500;
     }
@@ -69,7 +68,7 @@
                     <div class="mb-3">
                         <h5>
                             Date: <span class="text-secondary">{{ \Carbon\Carbon::parse($date)->format('F d, Y') }}</span>
-                            <span class="badge bg-info text-dark ms-3">Total Hours: {{ $details['total_hours'] }}</span>
+                            <span class="badge bg-primary text-light ms-3">Total Hours: {{ $details['total_hours'] }}</span>
                         </h5>
                         <div class="table-responsive">
                             <table class="table table-striped table-hover align-middle">

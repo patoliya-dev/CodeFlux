@@ -72,14 +72,24 @@
             border-color: #764ba2;
         }
 
-        .btn-gradient {
-            background: linear-gradient(to right, #667eea, #764ba2);
+        .btn-primary {
+            background: #2b1c3b;
             color: #fff;
             font-weight: 600;
             transition: 0.3s;
+            border-color: #2b1c3b;
         }
-        .btn-gradient:hover {
-            background: linear-gradient(to right, #764ba2, #667eea);
+        .btn-primary:hover {
+            background: #2b1c3b;
+        }
+
+        .btn-primary:focus {
+            border-color: #2b1c3b;
+            background: #2b1c3b;
+        }
+
+        .bg-primary {
+            background-color: #764ba2 !important;
         }
 
         footer {
