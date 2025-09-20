@@ -199,7 +199,7 @@ class AttendanceController extends Controller
 
             return back()->with('error', $responseData['message'] ?? 'Unknown error');
         } catch (\Exception $e) {
-            return back()->with('error', 'API Error: ' . $e->getMessage());
+            return back()->with('error', 'No user found with this face');
         }
     }
 
