@@ -142,44 +142,65 @@ class AttendanceController extends Controller
         $images = $request->file('images');
         $postData = [];
 
-        // Add each image under the same key 'images' (numeric array)
-        foreach ($images as $i => $image) {
-            $postData["images[$i]"] = new \CURLFile(
+        // Curl in PHP doesn't support multiple identical keys by default in POSTFIELDS,
+        // so we manually build the post fields like this:
+        foreach ($images as $image) {
+            $postData['images[]'] = $postData['images[]'] ?? [];
+            $postData['images[]'][] = new \CURLFile(
                 $image->getRealPath(),
                 mime_content_type($image->getRealPath()),
                 $image->getClientOriginalName()
             );
         }
 
-        $apiUrl = env('PYTHON_API_URL') . "/attendance/multi";
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $apiUrl);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-
-        $response = curl_exec($ch);
-        $error = curl_error($ch);
-        curl_close($ch);
-
-        if ($error) {
-            return back()->with('error', 'API Error: ' . $error);
-        }
-
-        $responseData = json_decode($response, true);
-        \Log::info($responseData);
-
-        if (isset($responseData['details'])) {
-            $successMessages = [];
-            foreach ($responseData['details'] as $detail) {
-                $successMessages[] = $detail['name'] . ' marked ' . $detail['last_status'] . ' at ' . $detail['last_timestamp'];
+        $flattenedPostData = [];
+        foreach ($postData as $key => $files) {
+            foreach ($files as $file) {
+                $flattenedPostData[$key] = $file; // overwrite to keep key the same for each file
+                // To keep multiple identical keys, use numeric keys but with correct names:
+                // So change key name to "images[]" on every file:
+                $flattenedPostData['images[]'] = $file;
             }
-            return back()->with('success', implode('<br>', $successMessages));
         }
 
-        return back()->with('error', $responseData['message'] ?? 'Unknown error');
-    }
+        $flattenedPostData = [];
+        foreach ($images as $image) {
+            $flattenedPostData[] = new \CURLFile(
+                $image->getRealPath(),
+                mime_content_type($image->getRealPath()),
+                $image->getClientOriginalName()
+            );
+        }
 
+        $client = new \GuzzleHttp\Client();
+        $multipartData = [];
+        foreach ($images as $image) {
+            $multipartData[] = [
+                'name' => 'images',
+                'contents' => fopen($image->getRealPath(), 'r'),
+                'filename' => $image->getClientOriginalName(),
+                'headers'  => ['Content-Type' => mime_content_type($image->getRealPath())]
+            ];
+        }
+
+        try {
+            $response = $client->post(env('PYTHON_API_URL') . "/attendance/multi", [
+                'multipart' => $multipartData
+            ]);
+            $responseData = json_decode($response->getBody()->getContents(), true);
+
+            if (isset($responseData['details'])) {
+                $successMessages = [];
+                foreach ($responseData['details'] as $detail) {
+                    $successMessages[] = $detail['name'] . ' marked ' . $detail['last_status'] . ' at ' . $detail['last_timestamp'];
+                }
+                return back()->with('success', implode('<br>', $successMessages));
+            }
+
+            return back()->with('error', $responseData['message'] ?? 'Unknown error');
+        } catch (\Exception $e) {
+            return back()->with('error', 'API Error: ' . $e->getMessage());
+        }
+    }
 
 }
