@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('users.create');
 });
 
 Route::get('/register', [UserController::class, 'create'])->name('users.create');

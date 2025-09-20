@@ -10,7 +10,7 @@ import csv
 
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-# from flask import 
+# from flask import
 
 app = Flask(__name__)
 
@@ -75,26 +75,6 @@ def toggle_attendance(user_id):
     return new_status
 
 
-# ---------------- API Endpoints ----------------
-# @app.route("/register", methods=["POST"])
-# def register():
-#     name = request.form.get("name")
-#     file = request.files.get("image")
-
-#     if not name or not file:
-#         return jsonify({"error": "Name and image required"}), 400
-
-#     image = face_recognition.load_image_file(file)
-#     encodings = face_recognition.face_encodings(image)
-
-#     if len(encodings) == 0:
-#         return jsonify({"error": "No face detected"}), 400
-
-#     encoding = encodings[0]
-#     save_user(name, encoding)
-
-#     return jsonify({"message": f"User {name} registered successfully"})
-
 @app.route("/register", methods=["POST"])
 def register():
     name = request.form.get("name")
@@ -141,7 +121,7 @@ def register():
     conn.commit()
     conn.close()
 
-    return jsonify({"message": f"User '{name}' registered successfully"})
+    return jsonify({"message": f"User {name} registered successfully"})
 
 
 
@@ -213,81 +193,6 @@ def webcam_attendance():
 
     video_capture.release()
     cv2.destroyAllWindows()
-
-
-
-# @app.route("/report", methods=["GET"])
-# def report():
-#     user_id = request.args.get("user_id")
-#     start_date = request.args.get("start_date")
-#     end_date = request.args.get("end_date")
-
-#     # Default to current month
-#     today = datetime.now()
-#     if not start_date or not end_date:
-#         start_date = today.replace(day=1).strftime("%Y-%m-%d")
-#         last_day = (today.replace(day=1) + timedelta(days=32)).replace(day=1) - timedelta(days=1)
-#         end_date = last_day.strftime("%Y-%m-%d")
-
-#     conn = get_db()
-#     c = conn.cursor(dictionary=True)
-
-#     query = """
-#         SELECT u.id AS user_id, u.name, a.status, a.timestamp
-#         FROM attendance a
-#         JOIN users u ON a.user_id = u.id
-#         WHERE DATE(a.timestamp) BETWEEN %s AND %s
-#     """
-#     params = [start_date, end_date]
-
-#     if user_id:
-#         query += " AND u.id = %s"
-#         params.append(user_id)
-
-#     query += " ORDER BY u.id, a.timestamp ASC"
-#     c.execute(query, params)
-#     rows = c.fetchall()
-#     conn.close()
-
-#     # Process report
-#     report_data = {}
-#     for row in rows:
-#         uid = row["user_id"]
-#         name = row["name"]
-#         date = row["timestamp"].strftime("%Y-%m-%d")
-#         time = row["timestamp"].strftime("%H:%M:%S")
-#         status = row["status"]
-
-#         if uid not in report_data:
-#             report_data[uid] = {"name": name, "dates": {}}
-
-#         if date not in report_data[uid]["dates"]:
-#             report_data[uid]["dates"][date] = {"entries": [], "total_hours": 0}
-
-#         report_data[uid]["dates"][date]["entries"].append({"status": status, "time": time})
-
-#     # Calculate total hours per day
-#     for uid, udata in report_data.items():
-#         for date, ddata in udata["dates"].items():
-#             entries = ddata["entries"]
-#             total_seconds = 0
-#             in_time = None
-
-#             for entry in entries:
-#                 t = datetime.strptime(entry["time"], "%H:%M:%S")
-#                 if entry["status"] == "IN":
-#                     in_time = t
-#                 elif entry["status"] == "OUT" and in_time:
-#                     diff = (t - in_time).total_seconds()
-#                     if diff > 0:
-#                         total_seconds += diff
-#                     in_time = None
-
-#             ddata["total_hours"] = round(total_seconds / 3600, 2)  # hours
-
-#     return jsonify(report_data)
-
-
 
 
 @app.route("/report", methods=["GET"])
