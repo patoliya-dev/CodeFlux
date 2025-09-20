@@ -43,9 +43,6 @@
         @if(session('error'))
             <div class="alert alert-danger mb-2">{{ session('error') }}</div>
         @endif
-        @if(session('error'))
-            <div class="alert alert-danger">{{ session('error') }}</div>
-        @endif
         <form action="{{ route('users.register') }}" method="POST" enctype="multipart/form-data" id="userForm">
             @csrf
 
