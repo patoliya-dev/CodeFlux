@@ -17,22 +17,22 @@ class UserController extends Controller
     // Store user
     public function register(Request $request)
     {
-        // Valid
+        // Validate input
         $request->validate([
-            'name' => 'required|string|max:255',
-            // 'encoding' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'name' => 'required|string|max:255|unique:users,name',
+            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $name = $request->name;
-        $imagePath = $request->file('encoding')->getRealPath();
-       
+        $imagePath = $request->file('image')->getRealPath();
+        $imageName = $request->file('image')->getClientOriginalName();
+
         // API endpoint
-        $apiUrl = env('PYTHON_API_URL') . "/register"; 
-        
-        // Prepare POST data
+        $apiUrl = env('PYTHON_API_URL') . "/register";
+
         $postData = [
             'name' => $name,
-            'encoding' => new \CURLFile($imagePath, $request->file('encoding')->getMimeType(), $request->file('encoding')->getClientOriginalName())
+            'image' => new \CURLFile($imagePath, mime_content_type($imagePath), $imageName)
         ];
 
         // Initialize cURL
@@ -42,23 +42,20 @@ class UserController extends Controller
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
 
-        // Optional: Add headers if required (e.g., Authorization)
-        // curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        //     'Authorization: Bearer YOUR_API_TOKEN'
-        // ]);
-
-        // Execute cURL
+        // Execute
         $response = curl_exec($ch);
         $error = curl_error($ch);
         curl_close($ch);
-
         if ($error) {
             return back()->with('error', 'API Error: ' . $error);
         }
 
-        // You can decode JSON response if needed
         $responseData = json_decode($response, true);
 
-        return back()->with('success', 'User registered via API successfully! Response: ' . $response);
+        if (isset($responseData['error'])) {
+            return back()->with('error', $responseData['error']);
+        }
+
+        return back()->with('success', $responseData['message'] ?? 'User registered via API successfully!');
     }
 }

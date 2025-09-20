@@ -43,24 +43,25 @@
         @if(session('error'))
             <div class="alert alert-danger mb-2">{{ session('error') }}</div>
         @endif
-
+        @if(session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
         <form action="{{ route('users.register') }}" method="POST" enctype="multipart/form-data" id="userForm">
             @csrf
 
             <div class="mb-3">
                 <label for="name" class="form-label text-black">Name</label>
-                <input type="text" name="name" id="name" 
-                       class="form-control @error('name') is-invalid @enderror" 
+                <input type="text" name="name" id="name"
+                       class="form-control @error('name') is-invalid @enderror"
                        placeholder="Enter your name" value="{{ old('name') }}">
                 @error('name')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
-
             <div class="mb-3">
                 <label for="image" class="form-label text-black">Profile Image</label>
-                <input type="file" name="image" id="image" 
-                       class="form-control @error('image') is-invalid @enderror" 
+                <input type="file" name="image" id="image"
+                       class="form-control @error('image') is-invalid @enderror"
                        accept="image/*">
                 @error('image')
                     <div class="invalid-feedback">{{ $message }}</div>
@@ -75,7 +76,6 @@
         </form>
     </div>
 </div>
-
 <script>
     // Frontend validation & image preview
     document.getElementById('userForm').addEventListener('submit', function(e){

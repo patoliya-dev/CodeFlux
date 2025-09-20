@@ -98,7 +98,6 @@
     </style>
 </head>
 <body>
-
     <!-- Modern Header Bar -->
     <nav class="navbar header-bar">
         <div class="container d-flex justify-content-between align-items-center">
@@ -106,9 +105,9 @@
                 <i class="bi bi-person-check-fill"></i> Face Attendance
             </a>
             <div class="d-none d-md-flex">
-                <a class="nav-link" href="{{ url('/') }}">Home</a>
-                <a class="nav-link" href="#">About</a>
-                <a class="nav-link" href="#">Contact</a>
+                <a class="nav-link" href="{{ route('attendance')}}">Attandance</a>
+                <a class="nav-link" href="{{ route('attendance.report') }}">Report</a>
+                <a class="nav-link" href="{{ route('attendance.multiple') }}">Multiple Recognition</a>
             </div>
         </div>
     </nav>
@@ -122,6 +121,7 @@
     <footer>
         &copy; {{ date('Y') }} Face Recognition Attendance System. All rights reserved.
     </footer>
+
 
     <!-- Bootstrap JS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
